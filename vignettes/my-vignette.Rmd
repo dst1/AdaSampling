@@ -9,20 +9,4 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-
-devtools::load_all(".") #Change this to "library(AdaSampling::adaSample())" when package is built.
-data(brca)
-
-```
-
-Here we will examine how AdaSampling works on the Wisconsin Breast Cancer dataset, `brca`, from the UCI Machine Learning Repository and included as part of this package. For more information about the variables, try `?brca`. This dataset contains ten features, with an eleventh column containing the class labels, *malignant* or *benign*.
-
-```{r preview}
-head(brca)
-```
 
