@@ -8,16 +8,15 @@ traditional classifying algorithm. See our publication for details,
 documentation and examples.
 
 ### References
-* Yang, P., Ormerod, J., Liu, W., Ma, C., Zomaya, A., Yang, J.(2018) AdaSampling for positive-unlabeled and label noise learning with bioinformatics applications. IEEE Transactions on Cybernetics, accepted. doi:10.1109/TCYB.2018.2816984 
+* **Yang, P.**, Ormerod, J., Liu, W., Ma, C., Zomaya, A., Yang, J.(2018) AdaSampling for positive-unlabeled and label noise learning with bioinformatics applications. _IEEE Transactions on Cybernetics_, doi:10.1109/TCYB.2018.2816984 
 
-* Yang, P., Liu, W., Yang, J. (2017). Positive unlabeled learning via wrapper-based adaptive 
-sampling. Proceedings of the Twenty-Sixth International Joint Conference on Artificial 
-Intelligence, 3273-3279. 
-[[fulltext](https://doi.org/10.24963/ijcai.2017/457)]
+* **Yang, P.**, Liu, W., Yang, J. (2017). Positive unlabeled learning via wrapper-based adaptive 
+sampling. Proceedings of the 26th International Joint Conference on Artificial 
+Intelligence (IJCAI), 3273-3279. [[fulltext](https://doi.org/10.24963/ijcai.2017/457)]
 
 To install this package, use:
 ```r
-devtools::install_github("dinukap/AdaSampling", build_vignettes = TRUE)
+devtools::install_github("PengyiYang/AdaSampling", build_vignettes = TRUE)
 library(AdaSampling)
 ```
 Current version of this package includes two functions:
