@@ -17,7 +17,7 @@ Intelligence, 3273-3279.
 
 To install this package, use:
 ```r
-devtools::install_github("dinukap/AdaSampling", build_vignettes = TRUE)
+devtools::install_github("PengyiYang/AdaSampling", build_vignettes = TRUE)
 library(AdaSampling)
 ```
 Current version of this package includes two functions:
