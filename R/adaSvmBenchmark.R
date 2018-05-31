@@ -1,6 +1,6 @@
 #' Benchmarking AdaSampling efficacy on noisy labelled data.
 #'
-#' \code{adaBenchmark()} allows a comparison between the performance
+#' \code{adaSvmBenchmark()} allows a comparison between the performance
 #' of an AdaSampling-enhanced SVM (support vector machine)-
 #' classifier against the SVM-classifier on its
 #' own. It requires a matrix of features (extracted from a labelled dataset),
@@ -26,10 +26,13 @@
 #' please see \code{adaSample()}.
 #'
 #' @section References:
-#' Yang, P., Liu, W., Yang. J. (2016) Positive unlabeled learning via wrapper-based
-#' adaptive sampling. \emph{International Joint Conferences on Artificial Intelligence Organization.}
+#' Yang, P., Liu, W., Yang. J. (2017) Positive unlabeled learning via wrapper-based
+#' adaptive sampling. \emph{International Joint Conferences on Artificial Intelligence (IJCAI)}, 3272-3279
 #'
-#' @seealso allows you to point to other useful resources, either on the web, \url{http://www.r-project.org}
+#' Yang, P., Ormerod, J., Liu, W., Ma, C., Zomaya, A., Yang, J.(2018) 
+#' AdaSampling for positive-unlabeled and label noise learning with bioinformatics applications. 
+#' \emph{IEEE Transactions on Cybernetics}, doi:10.1109/TCYB.2018.2816984
+#'
 #'
 #' @param data.mat a rectangular matrix or data frame that can be
 #' coerced to a matrix, containing the
@@ -40,24 +43,17 @@
 #' Must be in the same order and of the same length as \code{data.mat}. Labels
 #' must be 1 for positive observations, and 0 for negative observations.
 #' @param data.cls.truth a numeric vector of true class labels for
-#' the dataset. Must be
-#' the same order and of the same length as \code{data.mat}. Labels must
+#' the dataset. Must be the same order and of the same length as \code{data.mat}. Labels must
 #' be 1, for positive observations, and 0 for negative observations.
-#' @param s sets the seed.
+#' @param cvSeed sets the seed for cross-validation.
 #' @param C sets how many times to run the classifier, for the AdaEnsemble
 #' condition. See Description above.
 #' @param sampleFactor provides a control on the sample size for resampling.
-#' @param kfolds an integer for the number of folds to be used for k-fold
-#' cross validation.
+#' @return performance matrix
 #' @export
 
-adaBenchmark <- function(data.mat, data.cls, data.cls.truth, s = 1, C=50, sampleFactor=1, kfolds = 5){
-
-  #data.cls new name for data.cls.truth
-  #data.cls.noisy new name for data.cls
-
+adaSvmBenchmark <- function(data.mat, data.cls, data.cls.truth, cvSeed, C=50, sampleFactor=1){ 
   ##############------------Helper functions--------------##################################
-
   ### evaluation function
   evaluate <- function(TN, FP, TP, FN, psd=TRUE, print=FALSE) {
     mat <- rbind(TN, FP, TP, FN)
@@ -127,23 +123,20 @@ adaBenchmark <- function(data.mat, data.cls, data.cls.truth, s = 1, C=50, sample
     })
   }
 
+  
   ##############------------------------------------------##################################
   #Convert to factors
-  data.cls.truth <- as.factor(data.cls.truth)
-  data.cls <- as.factor(data.cls)
-
   eval <- matrix(NA, nrow=4, ncol=3)
   colnames(eval) <- c("Se", "Sp", "F1")
   rownames(eval) <- c("Original", "Baseline", "AdaSingle", "AdaEnsemble")
-
-  k <- kfolds
-  set.seed(s)
-  fold <- caret::createFolds(data.cls.truth, k);
+  k <- 5
+  set.seed(cvSeed)
+  fold <- createFolds(data.cls.truth, k);
   # gold standard (orignal data)
   TP <- TN <- FP <- FN <- c()
   for(i in 1:length(fold)){
-    model <- e1071::svm(data.mat[-fold[[i]],], data.cls.truth[-fold[[i]]]) #This HAS to be a factor for classification! If numeric, then will turn into regression!
-    preds <- predict(model, data.mat[fold[[i]],], decision.values=TRUE, probability=F)
+    model <- svm(data.mat[-fold[[i]],], data.cls.truth[-fold[[i]]])
+    preds <- ifelse(predict(model, data.mat[fold[[i]],])> 0.5, 1, 0)
     TP <- c(TP, sum((data.cls.truth[fold[[i]]] == preds)[data.cls.truth[fold[[i]]] == "1"]))
     TN <- c(TN, sum((data.cls.truth[fold[[i]]] == preds)[data.cls.truth[fold[[i]]] == "0"]))
     FP <- c(FP, sum((data.cls.truth[fold[[i]]] != preds)[preds == "1"]))
@@ -153,44 +146,40 @@ adaBenchmark <- function(data.mat, data.cls, data.cls.truth, s = 1, C=50, sample
   # without correction
   TP <- TN <- FP <- FN <- c()
   for(i in 1:length(fold)){
-    model <- e1071::svm(data.mat[-fold[[i]],], data.cls[-fold[[i]]]) #must be a factor -- see above
-    preds <- predict(model, data.mat[fold[[i]],], decision.values=TRUE, probability=F)
+    model <- svm(data.mat[-fold[[i]],], data.cls[-fold[[i]]])
+    preds <- ifelse(predict(model, data.mat[fold[[i]],])> 0.5, 1, 0)
     TP <- c(TP, sum((data.cls.truth[fold[[i]]] == preds)[data.cls.truth[fold[[i]]] == "1"]))
     TN <- c(TN, sum((data.cls.truth[fold[[i]]] == preds)[data.cls.truth[fold[[i]]] == "0"]))
     FP <- c(FP, sum((data.cls.truth[fold[[i]]] != preds)[preds == "1"]))
     FN <- c(FN, sum((data.cls.truth[fold[[i]]] != preds)[preds == "0"]))
   }
   eval[2,] <- evaluate(TN, FP, TP, FN, psd=FALSE)
-
+  
   # single classifier AdaSampling
   TP <- TN <- FP <- FN <- c()
   for (i in 1:length(fold)) {
-    #Pl.list <- rownames(data.mat[-fold[[i]],])[which(data.cls[-fold[[i]]] == 1)] #training set names
-    #Dl.list <- rownames(data.mat[-fold[[i]],])[which(data.cls[-fold[[i]]] == 0)] #test set names
-    pred <- AdaSampling::adaSample(train.mat = data.mat[-fold[[i]],], test.mat = data.mat[fold[[i]],],
-                                   cls = data.cls[-fold[[i]]], classifier="svm", sampleFactor = sampleFactor)[,"P"]
-
-
+    Ps <- rownames(data.mat[-fold[[i]],])[which(data.cls[-fold[[i]]] == 1)]
+    Ns <- rownames(data.mat[-fold[[i]],])[which(data.cls[-fold[[i]]] == 0)]
+    pred <- adaSample(Ps, Ns, data.mat[-fold[[i]],], test.mat=data.mat[fold[[i]],], classifier="svm", sampleFactor)[,"P"]
     TP <- c(TP, sum(pred > 0.5 & data.cls.truth[fold[[i]]] == 1))
     TN <- c(TN, sum(pred < 0.5 & data.cls.truth[fold[[i]]] == 0))
     FP <- c(FP, sum(pred > 0.5 & data.cls.truth[fold[[i]]] == 0))
     FN <- c(FN, sum(pred < 0.5 & data.cls.truth[fold[[i]]] == 1))
   }
   eval[3,] <- evaluate(TN, FP, TP, FN, psd=FALSE)
-
+  
   # ensemble classifier AdaSampling
   TP <- TN <- FP <- FN <- c()
   for (i in 1:length(fold)) {
-    #Pl.list <- rownames(data.mat[-fold[[i]],])[which(data.cls[-fold[[i]]] == 1)]
-    #Dl.list <- rownames(data.mat[-fold[[i]],])[which(data.cls[-fold[[i]]] == 0)]
-    pred <- AdaSampling::adaSample(train.mat = data.mat[-fold[[i]],], test.mat = data.mat[fold[[i]],],
-                                   cls = data.cls[-fold[[i]]], classifier="svm", C = C, sampleFactor = sampleFactor)[,"P"]
+    Ps <- rownames(data.mat[-fold[[i]],])[which(data.cls[-fold[[i]]] == 1)]
+    Ns <- rownames(data.mat[-fold[[i]],])[which(data.cls[-fold[[i]]] == 0)]
+    pred <- adaSample(Ps, Ns, data.mat[-fold[[i]],], test.mat=data.mat[fold[[i]],], classifier="svm", C=C, sampleFactor)[,"P"]
     TP <- c(TP, sum(pred > 0.5 & data.cls.truth[fold[[i]]] == 1))
     TN <- c(TN, sum(pred < 0.5 & data.cls.truth[fold[[i]]] == 0))
     FP <- c(FP, sum(pred > 0.5 & data.cls.truth[fold[[i]]] == 0))
     FN <- c(FN, sum(pred < 0.5 & data.cls.truth[fold[[i]]] == 1))
   }
   eval[4,] <- evaluate(TN, FP, TP, FN, psd=FALSE)
-
+  
   return(eval)
 }

@@ -5,34 +5,31 @@
 \title{Implementation of AdaSampling for positive unlabelled and label noise
 learning.}
 \usage{
-adaSample(train.mat, test.mat, cls, classifier = "knn", s = 1, C = 1,
+adaSample(Ps, Ns, train.mat, test.mat, classifier = "svm", s = 1, C = 1,
   sampleFactor = 1)
 }
 \arguments{
-\item{train.mat}{a rectangular matrix or data frame that can be
-coerced to a matrix, containing the
-features of training data, without class labels. Rownames (possibly
-containing unique identifiers) will be ignored.}
+\item{Ps}{names (name as index) of positive examples}
 
-\item{test.mat}{a rectangular matrix or data frame that can be
-coerced to a matrix, containg the test
-set, without class labels. Rownames are ignored.}
+\item{Ns}{names (name as index) of negative examples}
 
-\item{cls}{a numeric vector of class labels for the training set, must be in
-the same order and of the same length as \code{train.mat}. Labels must
-be 1, for positive observations, and 0 for negative observations.}
+\item{train.mat}{training data matrix, without class labels.}
 
-\item{classifier}{the type of classifier to be used, options are
-support vector machine, \code{"svm"}, k-nearest neighbour,
-\code{"knn"}, logistic regression \code{"logit"}, or
+\item{test.mat}{test data matrix, without class labels.}
+
+\item{classifier}{classification algorithm to be used for learning. Current options are
+support vector machine, \code{"svm"}, k-nearest neighbour, \code{"knn"}, logistic regression \code{"logit"}, or
 linear discriminant analysis \code{"lda"}.}
 
 \item{s}{sets the seed.}
 
-\item{C}{sets how many times to run the classifier, C>1 induces an
-ensemble learning model.}
+\item{C}{sets how many times to run the classifier, C>1 induces an ensemble learning model.}
 
 \item{sampleFactor}{provides a control on the sample size for resampling.}
+}
+\value{
+a two column matrix providing classification probabilities of each sample 
+with respect to positive and negative classes
 }
 \description{
 \code{adaSample()} applies the AdaSampling procedure to reduce noise
@@ -58,14 +55,15 @@ predictions for each row of the test set.
 
 Note that this function does not evaluate the quality of the model
 and thus does not compare its output to true values of the test set.
-To assess please see \code{adaBenchmark()}.
+To assess please see \code{adaSvmBenchmark()}.
 }
 \section{References}{
 
-Yang, P., Liu, W., Yang. J. (2016) Positive unlabeled learning via wrapper-based
-adaptive sampling. \emph{International Joint Conferences on Artificial Intelligence Organization.}
+Yang, P., Liu, W., Yang. J. (2017) Positive unlabeled learning via wrapper-based
+adaptive sampling. \emph{International Joint Conferences on Artificial Intelligence (IJCAI)}, 3272-3279
+
+Yang, P., Ormerod, J., Liu, W., Ma, C., Zomaya, A., Yang, J.(2018) 
+AdaSampling for positive-unlabeled and label noise learning with bioinformatics applications. 
+\emph{IEEE Transactions on Cybernetics}, doi:10.1109/TCYB.2018.2816984
 }
 
-\seealso{
-allows you to point to other useful resources, either on the web, \url{http://www.r-project.org}
-}

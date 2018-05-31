@@ -24,7 +24,7 @@ Current version of this package includes two functions:
 
 - `adaSample()` applies the AdaSampling procedure to reduce noise in the training set, 
 and subsequently trains a classifier from the new training set. 
-- `adaBenchmark()` which allows the performance of the AdaSampling procedure (with an SVM 
+- `adaSvmBenchmark()` which allows the performance of the AdaSampling procedure (with an SVM 
 classifier) to be compared against the performance of the SVM classifier on its own. 
 
 In order to see demonstrations of these two functions, see:
