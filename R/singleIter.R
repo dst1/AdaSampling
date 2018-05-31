@@ -104,7 +104,7 @@ singleIter <- function(Ps, Ns, dat, test=NULL, pos.probs=NULL, una.probs=NULL, c
       return(logit.pred)
     }
   } else if (classifier == "lda") {
-    lda.model <- lda(cls~., data=data.frame(train.sample, cls))
+    lda.model <- MASS::lda(cls~., data=data.frame(train.sample, cls))
     if (is.null(test)) {
       lda.pred <- predict(lda.model, data.frame(dat))$posterior
       colnames(lda.pred) <- c("N", "P")

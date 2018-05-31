@@ -3,7 +3,7 @@
 export(adaSample)
 export(adaSvmBenchmark)
 export(singleIter)
-import(e1071)
 import(class)
+import(e1071)
 import(stats)
 import(caret)
