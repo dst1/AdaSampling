@@ -16,7 +16,7 @@ Intelligence (IJCAI), 3273-3279. [[fulltext](https://doi.org/10.24963/ijcai.2017
 
 There are two ways to install the packages:
 
-To install from CRAN [https://CRAN.R-project.org/package=AdaSampling] (https://CRAN.R-project.org/package=AdaSampling):
+To install from CRAN [https://CRAN.R-project.org/package=AdaSampling]:
 
 ```r
 install.packages("AdaSampling")
