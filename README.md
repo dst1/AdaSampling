@@ -14,7 +14,15 @@ documentation and examples.
 sampling. Proceedings of the 26th International Joint Conference on Artificial 
 Intelligence (IJCAI), 3273-3279. [[fulltext](https://doi.org/10.24963/ijcai.2017/457)]
 
-To install this package, use:
+There are two ways to install the packages:
+
+To install from CRAN [https://CRAN.R-project.org/package=AdaSampling] (https://CRAN.R-project.org/package=AdaSampling):
+
+```r
+install.packages("AdaSampling")
+```
+
+To install from github, use:
 ```r
 devtools::install_github("PengyiYang/AdaSampling", build_vignettes = TRUE)
 library(AdaSampling)
