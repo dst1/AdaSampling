@@ -8,7 +8,7 @@ traditional classifying algorithm. See our publication for details,
 documentation and examples.
 
 ### References
-* **Yang, P.**, Ormerod, J., Liu, W., Ma, C., Zomaya, A., Yang, J.(2018) AdaSampling for positive-unlabeled and label noise learning with bioinformatics applications. _IEEE Transactions on Cybernetics_, doi:10.1109/TCYB.2018.2816984 
+* **Yang, P.**, Ormerod, J., Liu, W., Ma, C., Zomaya, A., Yang, J.(2018) AdaSampling for positive-unlabeled and label noise learning with bioinformatics applications. _IEEE Transactions on Cybernetics_, [[doi:10.1109/TCYB.2018.2816984](https://doi.org/10.1109/TCYB.2018.2816984)]
 
 * **Yang, P.**, Liu, W., Yang, J. (2017). Positive unlabeled learning via wrapper-based adaptive 
 sampling. Proceedings of the 26th International Joint Conference on Artificial 
