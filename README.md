@@ -40,5 +40,5 @@ browseVignettes("AdaSampling")
 sampling. Proceedings of the 26th International Joint Conference on Artificial 
 Intelligence (IJCAI), 3273-3279. [[fulltext](https://doi.org/10.24963/ijcai.2017/457)]
 
-### Additional credits
-This developmental version of the AdaSampling package is initially created by Kukulege Dinuka Perera.
+### Acknowledgement
+The initial github repo of the AdaSampling package was put together by Kukulege Dinuka Perera.
