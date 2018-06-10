@@ -4,9 +4,7 @@ Title: Adaptive Sampling for Positive Unlabeled and Label Noise Learning
 Version: 1.0
 Author: Pengyi Yang & Dinuka Perera
 Maintainer: Pengyi Yang <yangpy7@gmail.com>
-Description: Implements the AdaSampling procedure, a framework for both positive
-    unlabeled learning and learning with class label noise. See our publication for details, 
-    documentation and examples.
+Description: Implements the adaptive sampling procedure, a framework for both positive unlabeled learning and learning with class label noise. Yang, P., Ormerod, J., Liu, W., Ma, C., Zomaya, A., Yang, J. (2018) <doi:10.1109/TCYB.2018.2816984>.
 License: GPL-3
 Encoding: UTF-8
 Depends: R (>= 3.4.0)

@@ -44,7 +44,6 @@ In order to demonstrate how AdaSampling eliminates noisy class label data it wil
 set.seed(1)
 pos <- which(brca.cls == 1)
 neg <- which(brca.cls == 0)
-
 brca.cls.noisy <- brca.cls
 brca.cls.noisy[sample(pos, floor(length(pos) * 0.4))] <- 0
 brca.cls.noisy[sample(neg, floor(length(neg) * 0.3))] <- 1
