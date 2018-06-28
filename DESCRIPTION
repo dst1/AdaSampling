@@ -1,7 +1,7 @@
 Package: AdaSampling
 Type: Package
 Title: Adaptive Sampling for Positive Unlabeled and Label Noise Learning
-Version: 1.0
+Version: 1.1
 Author: Pengyi Yang & Dinuka Perera
 Maintainer: Pengyi Yang <yangpy7@gmail.com>
 Description: Implements the adaptive sampling procedure, a framework for both positive unlabeled learning and learning with class label noise. Yang, P., Ormerod, J., Liu, W., Ma, C., Zomaya, A., Yang, J. (2018) <doi:10.1109/TCYB.2018.2816984>.
