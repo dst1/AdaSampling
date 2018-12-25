@@ -38,7 +38,7 @@ for name, clf in [("SGD_lasso", SGDClassifier(loss="log", penalty="l1")),
     print(name)
     clf_res[name] = {}
     ada = AdaSample(clone(clf))
-    ada.fit(X_train, y_PU_train, C=10, samp_frac=SampFrac)
+    ada.fit(X_train, y_PU_train, C=10, sampleFactor=SampFrac)
     probas = ada.predict_proba(X_test, single=True)[:, 1]
     clf_res[name]["PU_single"] = accuracy_score(y_test, (probas > 0.5).astype(np.int))
 
