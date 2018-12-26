@@ -1,10 +1,28 @@
+"""
+AdaSampling implementation for python, scikit-learn compatible
+
+Author: Doron Stupp
+
+Based on the R package AdaSampling by: Pengyi Yang & Kukulege Dinuka Perera from Sydney U
+And the conference papers:
+-Yang, P., Ormerod, J., Liu, W., Ma, C., Zomaya, A., Yang, J.(2018)
+AdaSampling for positive-unlabeled and label noise learning with bioinformatics applications.
+IEEE Transactions on Cybernetics, doi:10.1109/TCYB.2018.2816984
+
+-Yang, P., Liu, W., Yang, J. (2017).
+Positive unlabeled learning via wrapper-based adaptive sampling.
+Proceedings of the 26th International Joint Conference on Artificial Intelligence (IJCAI), 3273-3279.
+"""
+
 import numpy as np
-from sklearn.base import BaseEstimator, clone
+from abc import ABCMeta
+from sklearn.base import ClassifierMixin, clone
+from sklearn.externals.six import with_metaclass
+from sklearn.ensemble.base import BaseEnsemble
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from tqdm import tqdm
 
-
-class AdaSample(BaseEstimator):
+class AdaSample(with_metaclass(ABCMeta, BaseEnsemble), ClassifierMixin):
     """
     Basic scikit learn estimator wrapper for using AdaSampling
     Based on the R package AdaSampling and the conference paper:
@@ -17,10 +35,17 @@ class AdaSample(BaseEstimator):
     with the methods - fit & predict_proba
     """
 
-    def __init__(self, clf):
-        self.base_estimator_ = clone(clf)
+    def __init__(self, base_estimator, C=10, sampleFactor=1, ensemble_sampleFactor=1, seed=False, n_rounds=25):
+        super(AdaSample, self).__init__(
+            base_estimator=base_estimator)
 
-    def fit(self, X, y, C=1, sampleFactor=1, ensemble_sampleFactor=1, seed=False, n_rounds=25):
+        self.C = C
+        self.sampleFactor = sampleFactor
+        self.ensemble_sampleFactor = ensemble_sampleFactor
+        self.seed = seed
+        self.n_rounds = n_rounds
+
+    def fit(self, X, y):
         """
         Fitting function
         Adheres to arguments of the original R package.
@@ -55,26 +80,26 @@ class AdaSample(BaseEstimator):
 
         self.adaSamples_ = []
         print("Training AdaSamples..")
-        for i in tqdm(range(n_rounds)):  # TODO: Maybe till convergence?
+        for i in tqdm(range(self.n_rounds)):  # TODO: Maybe till convergence?
             self.adaSamples_.append(
                 self._fit_single(X, y,
                                  Ps, Ns,
                                  pos_probs, una_probas,
-                                 sampleFactor, seed=(i if seed else False))
+                                 self.sampleFactor, seed=(i if self.seed else False))
             )
             probas = self.adaSamples_[-1].predict_proba(X)
             pos_probs = probas[Ps, 1] / probas[Ps, 1].sum()
             una_probas = probas[Ns, 0] / probas[Ns, 0].sum()
 
-        print("Training {} Classifiers".format(C))
+        print("Training {} Classifiers".format(self.C))
         self.estimators_ = []
-        for i in tqdm(range(C)):
+        for i in tqdm(range(self.C)):
             self.estimators_.append(
                 self._fit_single(X, y,
                                  Ps, Ns,
                                  pos_probs, una_probas,
-                                 ensemble_sampleFactor, #fitting using all the data
-                                 seed=(i if seed else False))
+                                 self.ensemble_sampleFactor,  # fitting using all the data
+                                 seed=(i if self.seed else False))
             )
         return self
 
@@ -103,7 +128,7 @@ class AdaSample(BaseEstimator):
         -------
         clf : fitted classifier object of type self.base_estimator_
         """
-        clf = clone(self.base_estimator_)
+        clf = clone(self.base_estimator)
         if type(seed) == int:
             np.random.seed(seed)
 
