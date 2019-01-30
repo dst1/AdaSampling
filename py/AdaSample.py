@@ -22,6 +22,7 @@ from sklearn.ensemble.base import BaseEnsemble
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from tqdm import tqdm
 
+
 class AdaSample(with_metaclass(ABCMeta, BaseEnsemble), ClassifierMixin):
     """
     Basic scikit learn estimator wrapper for using AdaSampling
@@ -35,7 +36,7 @@ class AdaSample(with_metaclass(ABCMeta, BaseEnsemble), ClassifierMixin):
     with the methods - fit & predict_proba
     """
 
-    def __init__(self, base_estimator, C=10, sampleFactor=1, ensemble_sampleFactor=1, seed=False, n_rounds=25):
+    def __init__(self, base_estimator, C=10, sampleFactor=1, ensemble_sampleFactor=1, seed=False, n_rounds=5):
         super(AdaSample, self).__init__(
             base_estimator=base_estimator)
 
@@ -45,7 +46,7 @@ class AdaSample(with_metaclass(ABCMeta, BaseEnsemble), ClassifierMixin):
         self.seed = seed
         self.n_rounds = n_rounds
 
-    def fit(self, X, y):
+    def fit(self, X, y, **kargs):
         """
         Fitting function
         Adheres to arguments of the original R package.
@@ -61,8 +62,8 @@ class AdaSample(with_metaclass(ABCMeta, BaseEnsemble), ClassifierMixin):
         ensemble_sampleFactor : float, subsampling factor for fitting the ensemble (default: 1)
         seed : bool, Whether to set seed
                if True, seed is set to iteration index (default: False)
-        n_rounds: int, number of AdaSampling rounds (default: 25)
-
+        n_rounds: int, number of AdaSampling rounds (default: 5)
+        **kargs: passed into base_extimator fit function
         Returns
         -------
         self : object
@@ -85,7 +86,7 @@ class AdaSample(with_metaclass(ABCMeta, BaseEnsemble), ClassifierMixin):
                 self._fit_single(X, y,
                                  Ps, Ns,
                                  pos_probs, una_probas,
-                                 self.sampleFactor, seed=(i if self.seed else False))
+                                 self.sampleFactor, (i if self.seed else False), **kargs)
             )
             probas = self.adaSamples_[-1].predict_proba(X)
             pos_probs = probas[Ps, 1] / probas[Ps, 1].sum()
@@ -99,11 +100,11 @@ class AdaSample(with_metaclass(ABCMeta, BaseEnsemble), ClassifierMixin):
                                  Ps, Ns,
                                  pos_probs, una_probas,
                                  self.ensemble_sampleFactor,  # fitting using all the data
-                                 seed=(i if self.seed else False))
+                                 (i if self.seed else False), **kargs)
             )
         return self
 
-    def _fit_single(self, X, y, Ps, Ns, pos_probs, una_probs, sampleFactor, seed):
+    def _fit_single(self, X, y, Ps, Ns, pos_probs, una_probs, sampleFactor, seed, **kargs):
         """
         Helper function for fitting.
         Similar to singleIter.R
@@ -136,15 +137,17 @@ class AdaSample(with_metaclass(ABCMeta, BaseEnsemble), ClassifierMixin):
         ids_p = np.random.choice(Ps, size=int(sampleFactor * sampleN), p=pos_probs)
         X_p = X[ids_p, :]
         y_p = y[ids_p]
+        assert (y_p==1).all()
 
         ids_n = np.random.choice(Ns, size=int(sampleFactor * sampleN), p=una_probs)
         X_n = X[ids_n, :]
         y_n = y[ids_n]
+        assert (y_n == 0).all()
 
         X_train = np.vstack((X_p, X_n))
         y_train = np.concatenate((y_p, y_n))
 
-        clf.fit(X_train, y_train)
+        clf.fit(X_train, y_train, **kargs)
 
         return clf
 
